@@ -44,6 +44,7 @@ type rawValue struct {
 	Constructed bool
 	Indefinite  bool
 	Content     []byte
+	RawData     []byte
 }
 
 func (raw *rawValue) encode() ([]byte, error) {
@@ -159,7 +160,7 @@ func removeLeadingBytes(buf []byte, target byte) []byte {
 	return buf[start:]
 }
 
-func decodeRawValue(reader io.Reader) (*rawValue, error) {
+func decodeRawValue(reader io.Reader, data []byte) (*rawValue, error) {
 
 	class, tag, constructed, err := decodeIdentifier(reader)
 	if err != nil {
@@ -194,7 +195,7 @@ func decodeRawValue(reader io.Reader) (*rawValue, error) {
 		content = content[:len(content)-2]
 	}
 
-	raw := rawValue{class, tag, constructed, indefinite, content}
+	raw := rawValue{class, tag, constructed, indefinite, content, data}
 	return &raw, nil
 }
 
