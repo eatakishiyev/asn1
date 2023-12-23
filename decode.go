@@ -148,7 +148,7 @@ func (ctx *Context) DecodeWithOptions(data []byte, obj interface{}, options stri
 	}
 
 	reader := bytes.NewBuffer(data)
-	err = ctx.decode(reader, value, opts)
+	err = ctx.decode(data, reader, value, opts)
 	if err != nil {
 		return nil, err
 	}
@@ -157,10 +157,10 @@ func (ctx *Context) DecodeWithOptions(data []byte, obj interface{}, options stri
 }
 
 // Main decode function
-func (ctx *Context) decode(reader io.Reader, value reflect.Value, opts *fieldOptions) error {
+func (ctx *Context) decode(data []byte, reader io.Reader, value reflect.Value, opts *fieldOptions) error {
 
 	// Parse an Asn.1 element
-	raw, err := decodeRawValue(reader)
+	raw, err := decodeRawValue(reader, data)
 	if err != nil {
 		return err
 	}
@@ -216,7 +216,7 @@ func (ctx *Context) getExpectedElement(raw *rawValue, elemType reflect.Type, opt
 			opts.application = false
 			// Parse child
 			reader := bytes.NewBuffer(data)
-			return ctx.decode(reader, value, opts)
+			return ctx.decode(data, reader, value, opts)
 		}
 		return
 	}
@@ -377,7 +377,7 @@ func (ctx *Context) getRawValuesFromBytes(data []byte, max int) ([]*rawValue, er
 	reader := bytes.NewBuffer(data)
 	for i := 0; i < max; i++ {
 		// Parse an Asn.1 element
-		raw, err := decodeRawValue(reader)
+		raw, err := decodeRawValue(reader, data)
 		if err != nil {
 			return nil, err
 		}
