@@ -198,7 +198,7 @@ func (ctx *Context) getExpectedElement(raw *rawValue, elemType reflect.Type, opt
 
 	if opts.any {
 		elem.decoder = ctx.decodeSlice
-		return
+		//return
 	}
 
 	// Modify the expected tag and decoder function based on the given options
