@@ -160,7 +160,7 @@ func removeLeadingBytes(buf []byte, target byte) []byte {
 	return buf[start:]
 }
 
-func decodeRawValue(reader io.Reader, data []byte) (*rawValue, error) {
+func decodeRawValue(reader io.Reader) (*rawValue, error) {
 
 	class, tag, constructed, err := decodeIdentifier(reader)
 	if err != nil {
@@ -176,6 +176,7 @@ func decodeRawValue(reader io.Reader, data []byte) (*rawValue, error) {
 	}
 
 	// Indefinite form
+	var data []byte
 	var content []byte
 	if !indefinite {
 		content = make([]byte, length)
@@ -193,6 +194,7 @@ func decodeRawValue(reader io.Reader, data []byte) (*rawValue, error) {
 		// At this point, buffer also contains the EoC bytes
 		content = buffer.Bytes()
 		content = content[:len(content)-2]
+		data = buffer.Bytes()
 	}
 
 	raw := rawValue{class, tag, constructed, indefinite, content, data}
