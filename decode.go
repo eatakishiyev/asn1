@@ -159,6 +159,15 @@ func (ctx *Context) DecodeWithOptions(data []byte, obj interface{}, options stri
 // Main decode function
 func (ctx *Context) decode(reader io.Reader, value reflect.Value, opts *fieldOptions) error {
 
+	if opts.any {
+		data, err := io.ReadAll(reader)
+		if err != nil {
+			return err
+		}
+		value.SetBytes(data)
+		return nil
+	}
+
 	// Parse an Asn.1 element
 	raw, err := decodeRawValue(reader)
 	if err != nil {
@@ -194,14 +203,6 @@ func (ctx *Context) getExpectedElement(raw *rawValue, elemType reflect.Type, opt
 	elem, err = ctx.getUniversalTag(elemType, opts)
 	if err != nil {
 		return
-	}
-
-	if opts.any {
-		elem.decoder = func(data []byte, value reflect.Value) error {
-			value.SetBytes(data)
-			return nil
-		}
-		//return
 	}
 
 	// Modify the expected tag and decoder function based on the given options
