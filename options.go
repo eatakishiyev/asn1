@@ -11,6 +11,7 @@ type fieldOptions struct {
 	explicit     bool
 	indefinite   bool
 	optional     bool
+	any          bool
 	set          bool
 	tag          *int
 	defaultValue *int
@@ -87,6 +88,9 @@ func parseOption(opts *fieldOptions, args []string) error {
 
 	case "choice":
 		opts.choice, err = parseStringOption(args)
+
+	case "any":
+		opts.any, err = parseBoolOption(args)
 
 	default:
 		err = syntaxError("Invalid option: %s", args[0])
