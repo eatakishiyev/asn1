@@ -197,7 +197,10 @@ func (ctx *Context) getExpectedElement(raw *rawValue, elemType reflect.Type, opt
 	}
 
 	if opts.any {
-		elem.decoder = ctx.decodeSlice
+		elem.decoder = func(data []byte, value reflect.Value) error {
+			value.SetBytes(data)
+			return nil
+		}
 		//return
 	}
 
