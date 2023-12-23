@@ -174,10 +174,12 @@ func (ctx *Context) decode(reader io.Reader, value reflect.Value, opts *fieldOpt
 	}
 
 	// And tag must match
-	if raw.Class != elem.class || raw.Tag != elem.tag && !opts.any {
-		ctx.log.Printf("%#v\n", opts)
-		return parseError("expected tag (%d,%d) but found (%d,%d)",
-			elem.class, elem.tag, raw.Class, raw.Tag)
+	if !opts.any {
+		if raw.Class != elem.class || raw.Tag != elem.tag {
+			ctx.log.Printf("%#v\n", opts)
+			return parseError("expected tag (%d,%d) but found (%d,%d)",
+				elem.class, elem.tag, raw.Class, raw.Tag)
+		}
 	}
 
 	return elem.decoder(raw.Content, value)
