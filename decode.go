@@ -159,15 +159,6 @@ func (ctx *Context) DecodeWithOptions(data []byte, obj interface{}, options stri
 // Main decode function
 func (ctx *Context) decode(reader io.Reader, value reflect.Value, opts *fieldOptions) error {
 
-	if opts.any {
-		data, err := io.ReadAll(reader)
-		if err != nil {
-			return err
-		}
-		value.SetBytes(data)
-		return nil
-	}
-
 	// Parse an Asn.1 element
 	raw, err := decodeRawValue(reader)
 	if err != nil {
@@ -390,6 +381,7 @@ func (ctx *Context) getRawValuesFromBytes(data []byte, max int) ([]*rawValue, er
 		if err != nil {
 			return nil, err
 		}
+		raw.RawData = data
 		rawValues = append(rawValues, raw)
 		if reader.Len() == 0 {
 			return rawValues, nil
@@ -413,7 +405,13 @@ func (ctx *Context) matchExpectedValues(eValues []expectedFieldElement, rValues 
 		missing := true
 		if rIndex < len(rValues) {
 			raw := rValues[rIndex]
-			if e.class == raw.Class && e.tag == raw.Tag || e.opts.any {
+
+			if e.opts.any {
+				e.value.SetBytes(raw.RawData)
+				return nil
+			}
+
+			if e.class == raw.Class && e.tag == raw.Tag {
 				err := e.decoder(raw.Content, e.value)
 				if err != nil {
 					return err
