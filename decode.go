@@ -407,7 +407,7 @@ func (ctx *Context) matchExpectedValues(eValues []expectedFieldElement, rValues 
 		missing := true
 		if rIndex < len(rValues) {
 			raw := rValues[rIndex]
-			if e.class == raw.Class && e.tag == raw.Tag {
+			if e.class == raw.Class && e.tag == raw.Tag || e.opts.any {
 				err := e.decoder(raw.Content, e.value)
 				if err != nil {
 					return err
