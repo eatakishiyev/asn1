@@ -1,10 +1,9 @@
 package asn1_test
 
 import (
+	"github.com/eatakishiyev/asn1/v2"
 	"log"
 	"reflect"
-
-	"github.com/PromonLogicalis/asn1"
 )
 
 func Example() {

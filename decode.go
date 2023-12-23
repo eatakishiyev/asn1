@@ -25,7 +25,6 @@ type expectedFieldElement struct {
 // to the value that will hold the parsed data.
 //
 // See (*Context).DecodeWithOptions() for further details.
-//
 func (ctx *Context) Decode(data []byte, obj interface{}) (rest []byte, err error) {
 	return ctx.DecodeWithOptions(data, obj, "")
 }
@@ -131,7 +130,6 @@ func (ctx *Context) Decode(data []byte, obj interface{}) (rest []byte, err error
 //
 // Similarly, a struct marked with "set" always enforces that same order when
 // decoding in DER.
-//
 func (ctx *Context) DecodeWithOptions(data []byte, obj interface{}, options string) (rest []byte, err error) {
 
 	opts, err := parseOptions(options)
@@ -176,7 +174,7 @@ func (ctx *Context) decode(reader io.Reader, value reflect.Value, opts *fieldOpt
 	}
 
 	// And tag must match
-	if raw.Class != elem.class || raw.Tag != elem.tag {
+	if raw.Class != elem.class || raw.Tag != elem.tag && !opts.any {
 		ctx.log.Printf("%#v\n", opts)
 		return parseError("expected tag (%d,%d) but found (%d,%d)",
 			elem.class, elem.tag, raw.Class, raw.Tag)
@@ -193,6 +191,11 @@ func (ctx *Context) getExpectedElement(raw *rawValue, elemType reflect.Type, opt
 	// Get the expected universal tag and its decoder for the given Go type
 	elem, err = ctx.getUniversalTag(elemType, opts)
 	if err != nil {
+		return
+	}
+
+	if opts.any {
+		elem.decoder = ctx.decodeSlice
 		return
 	}
 
@@ -330,7 +333,6 @@ func (ctx *Context) getUniversalTagByKind(objType reflect.Type, opts *fieldOptio
 	return
 }
 
-//
 func (ctx *Context) getExpectedFieldElements(value reflect.Value) ([]expectedFieldElement, error) {
 	expectedValues := []expectedFieldElement{}
 	for i := 0; i < value.NumField(); i++ {
